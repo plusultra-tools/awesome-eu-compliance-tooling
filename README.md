@@ -4,7 +4,7 @@
 
 Between 2024 and 2027 the EU stacks seven major digital regulations on top of each other: the Cyber Resilience Act (CRA, fully applicable December 2027), the European Health Data Space (EHDS, phased in from 2027), the AI Act (high-risk obligations applicable August 2026), NIS2 (in force since October 2024), DORA (applicable January 2025), the Medical Device Regulation (MDR, applicable since 2021 with extended deadlines through 2028), and GDPR (since 2018). Each framework demands evidence (SBOMs, conformity assessments, fundamental-rights impact assessments, ICT-register exports, technical files, DPIAs). This list curates the tooling engineers actually reach for when producing that evidence. Inclusion bar: the tool exists, is reachable, has a discoverable license, and addresses a specific clause or annex of a named EU regulation. No vapor, no "compliance theatre" platforms with nothing to install.
 
-> Note. Inclusion is editorial. Listing does not equal endorsement. PRs welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
+> Note. Inclusion is editorial. Listing does not equal endorsement. PRs welcome — see the contributing guide.
 
 ## Contents
 
@@ -17,8 +17,6 @@ Between 2024 and 2027 the EU stacks seven major digital regulations on top of ea
 - [GDPR engineering tooling](#gdpr-engineering-tooling)
 - [Meta and cross-cutting](#meta-and-cross-cutting)
 - [Educational resources](#educational-resources)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Cyber Resilience Act (CRA)
 
@@ -51,7 +49,6 @@ Tools relevant to the EHDS Regulation (EU 2025/327): secondary-use access, FHIR 
 - [HAPI FHIR](https://github.com/hapifhir/hapi-fhir) - Reference Java implementation of HL7 FHIR with validator, server, and CLI; conformance baseline for the FHIR profiles MyHealth@EU mandates (Java, Apache-2.0, last activity 2026-05).
 - [MONAI Label](https://github.com/Project-MONAI/MONAILabel) - Open-source server for AI-assisted medical-image labelling with 3D Slicer, OHIF, and QuPath plugins; relevant where EHDS secondary-use datasets feed AI development (Python, Apache-2.0, last activity 2026-04).
 - [OHIF Viewer](https://github.com/OHIF/Viewers) - Web-based, DICOMweb-native viewer used as the reference UI for many EU imaging-research platforms exposing EHDS-style access (TypeScript, MIT, last activity 2026-05).
-- [Presidio](https://github.com/microsoft/presidio) - Microsoft PII detection and de-identification framework for free text; usable on FHIR narrative fields and clinical notes prior to EHDS secondary-use release (Python, MIT, last activity 2026-05).
 - [ONC Certification (g)(10) Test Kit](https://github.com/onc-healthit/onc-certification-g10-test-kit) - Successor to the archived Inferno program; FHIR conformance and security test kit reusable in EU MyHealth@EU pilots to validate FHIR endpoints (Ruby, Apache-2.0, last activity 2026-04).
 
 ## EU AI Act
@@ -150,10 +147,3 @@ Primary sources and well-regarded analyses. No vendor blogs unless they sit on t
 - [OpenRegulatory blog](https://openregulatory.com/blog/) - Plain-English MDR, IVDR, ISO 13485, and IEC 62304 explainers from a regulatory-affairs consultancy.
 - [FRIA Guide (ECNL and Danish Institute for Human Rights)](https://ecnl.org/publications/guide-fundamental-rights-impact-assessments-fria) - Practical model for fulfilling AI Act Article 27 fundamental-rights impact assessments.
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-
-[CC0 1.0](LICENSE), listed tools retain their own licenses.
