@@ -29,7 +29,7 @@ jobs:
           node-version: "20"
 
       - name: Install awesome-lint
-        run: npm install --global awesome-lint@0.19.0
+        run: npm install --global awesome-lint@2.3.0
 
       - name: Run awesome-lint
         run: awesome-lint README.md
