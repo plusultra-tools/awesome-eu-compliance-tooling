@@ -1,0 +1,61 @@
+name: Refresh CONTRIBUTORS.md
+
+# Maintainer-triggered (workflow_dispatch) or weekly cron. Rebuilds
+# CONTRIBUTORS.md from the GitHub Contributors API rather than appending on
+# every PR merge. This isolates the write permission from the PR-event path
+# and avoids the pwn-request class entirely.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate CONTRIBUTORS.md from GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          api="https://api.github.com/repos/${REPO}/contributors?per_page=100&anon=0"
+          {
+            printf '# Contributors\n\n'
+            printf 'This list is regenerated weekly from the GitHub Contributors API by `.github/workflows/contributors-refresh.yml`.\n\n'
+            printf '## Bootstrap maintainers\n\n'
+            printf '- [@plusultra-tools-ops](https://github.com/plusultra-tools-ops) - bootstrap curation, infrastructure, editorial baseline.\n\n'
+            printf '## All contributors\n\n'
+            curl -sSfL -H "Authorization: Bearer ${GH_TOKEN}" "${api}" \
+              | python3 -c '
+          import json, sys
+          for c in json.load(sys.stdin):
+              if c.get("type") != "User":
+                  continue
+              login = c["login"]
+              # Sanitize defensively
+              import re
+              if not re.fullmatch(r"[a-zA-Z0-9_-]{1,39}", login):
+                  continue
+              print(f"- [@{login}](https://github.com/{login})  ({c[\"contributions\"]} contributions)")
+          '
+          } > CONTRIBUTORS.md
+
+      - name: Commit if changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet CONTRIBUTORS.md; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CONTRIBUTORS.md
+          git commit -m "chore(contributors): weekly refresh"
+          git push

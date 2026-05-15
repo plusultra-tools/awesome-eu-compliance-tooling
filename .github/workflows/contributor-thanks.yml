@@ -1,0 +1,49 @@
+name: Contributor Thanks
+
+# Switched from pull_request_target to pull_request to avoid the well-known
+# "pwn-request" pattern (running with base-repo secrets + write tokens against
+# user-controlled head). After merge, the PR head is already on main, so
+# pull_request is sufficient and runs under the merger's permissions, not the
+# PR author's.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+# Minimal scope: only what each step needs. No contents:write here; the
+# CONTRIBUTORS.md update lives in a separate, maintainer-triggered workflow.
+permissions:
+  pull-requests: write
+  issues: write
+
+jobs:
+  thanks:
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.type == 'User' &&
+      github.event.pull_request.user.login != 'github-actions[bot]' &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    name: Post thank-you comment on merged PR
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Post thank-you comment (no checkout, no token leak surface)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // user is structured data, not interpolated into a template literal
+            // through shell. The GitHub Actions API URL-encodes the body field,
+            // so command injection via username is not possible from here.
+            // However we still sanitize defensively: keep only [a-zA-Z0-9_-].
+            const raw = context.payload.pull_request.user.login || '';
+            const user = raw.replace(/[^a-zA-Z0-9_-]/g, '');
+            if (!user) { core.warning('Empty/invalid username; skipping.'); return; }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: 'Thanks for the contribution, @' + user + '! :tada:\n\n' +
+                    'Your entry is now part of the list. A maintainer will add ' +
+                    'you to [CONTRIBUTORS.md](../blob/main/CONTRIBUTORS.md) on ' +
+                    'the next scheduled refresh.'
+            });

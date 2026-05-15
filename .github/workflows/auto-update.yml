@@ -1,0 +1,74 @@
+name: Auto-Update Proposals
+
+on:
+  schedule:
+    # Tuesday 06:00 UTC
+    - cron: "0 6 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  propose-updates:
+    name: Run auto_update.py and open PR
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run auto_update.py
+        id: autoupdate
+        env:
+          # GITHUB_TOKEN raises trending-page rate limit from 60 to 5,000/h.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python tools/auto_update.py \
+            --readme README.md \
+            --output /tmp/auto_update_proposal.md \
+            --classification-output /tmp/auto_update_classification.txt
+
+      - name: Read classification
+        id: classify
+        run: |
+          if [ -f /tmp/auto_update_classification.txt ]; then
+            kind="$(cat /tmp/auto_update_classification.txt)"
+          else
+            kind="none"
+          fi
+          echo "kind=${kind}" >> "$GITHUB_OUTPUT"
+
+      - name: Check proposal exists
+        id: hasproposal
+        run: |
+          if [ -s /tmp/auto_update_proposal.md ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open Pull Request
+        if: steps.hasproposal.outputs.found == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(auto-update): weekly scrape proposal"
+          branch: auto-update/weekly
+          delete-branch: true
+          title: "Auto-update: weekly proposal (${{ steps.classify.outputs.kind }})"
+          body-path: /tmp/auto_update_proposal.md
+          labels: |
+            auto-update
+            ${{ steps.classify.outputs.kind == 'trivial' && 'trivial' || 'needs-review' }}
+
+      - name: Auto-approve trivial PR
+        if: steps.hasproposal.outputs.found == 'true' && steps.classify.outputs.kind == 'trivial'
+        uses: hmarr/auto-approve-action@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

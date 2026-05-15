@@ -1,0 +1,35 @@
+name: Awesome Lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "README.md"
+      - ".github/workflows/awesome-lint.yml"
+  pull_request:
+    paths:
+      - "README.md"
+      - ".github/workflows/awesome-lint.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  awesome-lint:
+    name: Validate Awesome list format
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install awesome-lint
+        run: npm install --global awesome-lint@0.19.0
+
+      - name: Run awesome-lint
+        run: awesome-lint README.md

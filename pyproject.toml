@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "awesome-eu-compliance-tooling-tools"
+version = "0.1.0"
+description = "Internal tooling (auto-update, link-check, RSS digest) for the awesome-eu-compliance-tooling list."
+readme = "README.md"
+license = {text = "CC0-1.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "plusultra-tools", email = "plusultra.dev@proton.me"},
+]
+keywords = [
+    "awesome-list",
+    "eu-compliance",
+    "cra",
+    "gdpr",
+    "ai-act",
+    "nis2",
+    "dora",
+    "mdr",
+    "ehds",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Documentation",
+]
+
+[project.urls]
+Homepage = "https://github.com/plusultra-tools/awesome-eu-compliance-tooling"
+Issues = "https://github.com/plusultra-tools/awesome-eu-compliance-tooling/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tools*"]
+exclude = [".github*", "tests*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "RUF"]
+ignore = ["E501"]

@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.13.0
+    hooks:
+      - id: markdown-link-check
+        args: ["--quiet", "--config", ".markdown-link-check.json"]
+        files: ^(README\.md|CONTRIBUTING\.md|CODE_OF_CONDUCT\.md)$
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: ^README\.md$  # awesome-list trailing space sometimes intentional
+
+# awesome-lint is delegated to .github/workflows/awesome-lint.yml because the
+# tool is a Node CLI and we keep pre-commit Python-only locally.
